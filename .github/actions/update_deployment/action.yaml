@@ -29,5 +29,5 @@ runs:
       run: |
         cd pixer_deployment
         git add "environments/$PROJECT-$ENV/$HELM_CHART_NAME.yaml"
-        git commit -m "[$HELM_CHART_NAME][$ENV] Pipeline #$GITHUB_RUN_NUMBER: ${{ github.event.head_commit.message }}"
+        git commit -m "[$PROJECT-$ENV][$HELM_CHART_NAME] Pipeline #$GITHUB_RUN_NUMBER: ${{ github.event.head_commit.message }}"
         git push
