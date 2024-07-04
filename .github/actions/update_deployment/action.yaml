@@ -1,0 +1,33 @@
+name: Update deployment
+description: Update image in deployment repo
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Git user
+      shell: bash
+      run: |
+        git config --global user.email "actions@github.com"
+        git config --global user.name "GitHub Actions"
+
+    - name: Clone pixer-deployment repository
+      shell: bash
+      run: git clone git@github.com:rnyoo/pixer_deployment.git
+
+    - name: Update image in values.yaml
+      shell: bash
+      env:
+        RUNNER_ID: ${{ github.run_number }}
+      run: |
+         IMAGE_TAG=build-$PROJECT-$RUNNER_ID
+         VALUE_FOLDER_PATH=pixer_deployment/environments/$PROJECT-$ENV
+         cd $VALUE_FOLDER_PATH
+         sed -i "s|tag: build-$PROJECT-[0-9]\+|tag: $IMAGE_TAG|" $HELM_CHART_NAME.yaml
+
+    - name: Commit and Push changes
+      shell: bash
+      run: |
+        cd pixer_deployment
+        git add "environments/$PROJECT-$ENV/$HELM_CHART_NAME.yaml"
+        git commit -m "[$HELM_CHART_NAME][$ENV] Pipeline #$GITHUB_RUN_NUMBER: ${{ github.event.head_commit.message }}"
+        git push
