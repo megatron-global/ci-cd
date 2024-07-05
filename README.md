@@ -48,6 +48,9 @@ We need to pass these input variables:
     - ENV
     - PROJECT
     - HELM_CHART_NAME
+    - HELM_DEPLOYMENT_DIRECTORY
+    - REPOSITORY_URL
+    - REPOSITORY_NAME
 
 ```yaml
 name: CI/CD
@@ -94,6 +97,9 @@ jobs:
     runs-on: self-hosted 
     env:
       ENV: dev|uat|prod
+      REPOSITORY_URL: {deployment-repository-url}
+      REPOSITORY_NAME: {deployment-repository-name}
+      HELM_DEPLOYMENT_DIRECTORY: {helm-deployment-directory}
       PROJECT: {project-name}
       HELM_CHART_NAME: {helm-chart-name}
     steps:
