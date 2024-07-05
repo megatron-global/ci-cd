@@ -27,14 +27,17 @@ runs:
       run: python -m pip install -r requirements.txt
 
     - name: Setup credentials
-      shell: bash
       run: |
-        echo "[distutils]" > ~/.pypirc
-        echo "index-servers = gitlab" >> ~/.pypirc
-        echo "[gitlab]" >> ~/.pypirc
-        echo "repository = ${{ inputs.gitlab_repository }}" >> ~/.pypirc
-        echo "username = ${{ inputs.gitlab_username }}" >> ~/.pypirc
-        echo "password = ${{ inputs.gitlab_password }}" >> ~/.pypirc
+        cat <<EOF > ~/.pypirc
+        [distutils]
+        index-servers = gitlab
+
+        [gitlab]
+        repository = ${{ inputs.gitlab_repository }}
+        username = ${{ inputs.gitlab_username }}
+        password = ${{ inputs.gitlab_password }}
+        EOF
+
     - name: Build and pubish package
       shell: bash
       env:
