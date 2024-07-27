@@ -1,0 +1,44 @@
+name: Start deploying
+description: Notify start deploying
+
+inputs:
+  slack-webhook-url:
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Set up environment variables
+      run: |
+        echo "CI_JOB_URL=${{ github.event.head_commit.url }}" >> $GITHUB_ENV
+        echo "GITHUB_USER_NAME=${{ github.actor }}" >> $GITHUB_ENV
+        echo "CI_COMMIT_MESSAGE=${{ github.event.head_commit.message }}" >> $GITHUB_ENV
+
+    - name: Start deploy
+      run: |
+        escape() {
+          VALUE=${1//\//""}
+          VALUE=${VALUE//\"/""}
+          VALUE=${VALUE//\\/""}
+          echo $VALUE
+        }
+
+        sendMessage() {
+          local COLOR=$1
+          local CONTENT=$(escape "${2}")
+          local MESSAGE='{
+            "attachments": [
+              {
+                "color": "'$COLOR'",
+                "title": "'$CONTENT' :clock1: :clock3: :clock430:",
+                "title_link": "'$CI_JOB_URL'",
+                "text": ":farmer: *'$GITHUB_USER_NAME'* committed.\n\n```\n'${CI_COMMIT_MESSAGE}'\n```"
+              }
+            ],
+            "username": "Deployment Bot"
+          }'
+          curl -X POST -H 'Content-type: application/json' --data "$MESSAGE" ${{ inputs.aws-access-key-id }}
+        }
+
+        COLOR='#439FE0' # info color
+        sendMessage "$COLOR" "Deploying to $ENVIRONMENT..."
