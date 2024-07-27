@@ -9,12 +9,14 @@ runs:
   using: composite
   steps:
     - name: Set up environment variables
+      shell: bash
       run: |
         echo "CI_JOB_URL=${{ github.event.head_commit.url }}" >> $GITHUB_ENV
         echo "GITHUB_USER_NAME=${{ github.actor }}" >> $GITHUB_ENV
         echo "CI_COMMIT_MESSAGE=${{ github.event.head_commit.message }}" >> $GITHUB_ENV
 
     - name: Start deploy
+      shell: bash
       run: |
         escape() {
           VALUE=${1//\//""}
