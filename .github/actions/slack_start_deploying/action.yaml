@@ -39,7 +39,7 @@ runs:
             ],
             "username": "Deployment Bot"
           }'
-          curl -X POST -H 'Content-type: application/json' --data "$MESSAGE" ${{ inputs.aws-access-key-id }}
+          curl -X POST -H 'Content-type: application/json' --data "$MESSAGE" ${{ inputs.slack-webhook-url }}
         }
 
         COLOR='#439FE0' # info color
