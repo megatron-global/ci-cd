@@ -4,6 +4,8 @@ description: Notify end deploying
 inputs:
   slack-webhook-url:
     required: true
+  update-deployment-result:
+    required: true
 
 runs:
   using: composite
@@ -14,6 +16,7 @@ runs:
         echo "CI_JOB_URL=${{ github.event.head_commit.url }}" >> $GITHUB_ENV
         echo "GITHUB_USER_NAME=${{ github.actor }}" >> $GITHUB_ENV
         echo "CI_COMMIT_MESSAGE=${{ github.event.head_commit.message }}" >> $GITHUB_ENV
+        echo "UPDATE_DEPLOYMENT_RESULT=${{ inputs.update-deployment-result }}" >> $GITHUB_ENV
 
     - name: Send slack notification
       shell: bash
@@ -42,9 +45,9 @@ runs:
           curl -X POST -H 'Content-type: application/json' --data "$MESSAGE" ${{ inputs.slack-webhook-url }}
         }
 
-        if [ -f .success ]; then
+        if [ "${{ inputs.update-deployment-result }}" == "success" ]; then
           COLOR='#36A64F' # success color
-        sendMessage "$COLOR" "Deployed to $ENVIRONMENT successfully :rocket: :rocket: :rocket:"
+          sendMessage "$COLOR" "Deployed to $ENVIRONMENT successfully :rocket: :rocket: :rocket:"
         else
           COLOR='#FF0000' # danger color
           sendMessage "$COLOR" "Deployed to $ENVIRONMENT failed :skull_and_crossbones: :exploding_head: :hear_no_evil:"
