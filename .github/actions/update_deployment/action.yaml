@@ -27,6 +27,6 @@ runs:
       shell: bash
       run: |
         cd $REPOSITORY_NAME
-        git add "environments/$PROJECT-$ENV/$HELM_CHART_NAME.yaml"
-        git commit -m "[$PROJECT-$ENV][$HELM_CHART_NAME] Pipeline #$GITHUB_RUN_NUMBER: ${{ github.event.head_commit.message }}"
+        git add "environments/$ENVIRONMENT/$HELM_CHART_NAME.yaml"
+        git commit -m "[$ENVIRONMENT][$HELM_CHART_NAME] Pipeline #$GITHUB_RUN_NUMBER: ${{ github.event.head_commit.message }}"
         git push
