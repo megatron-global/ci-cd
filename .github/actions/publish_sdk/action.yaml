@@ -27,6 +27,7 @@ runs:
       run: python -m pip install -r requirements.txt
 
     - name: Setup credentials
+      shell: bash
       run: |
         cat <<EOF > ~/.pypirc
         [distutils]
