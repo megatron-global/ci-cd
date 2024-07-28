@@ -32,7 +32,7 @@ runs:
             "attachments": [
               {
                 "color": "'$COLOR'",
-                "title": "'$CONTENT' :clock1: :clock3: :clock430:",
+                "title": "'$CONTENT'",
                 "title_link": "'$CI_JOB_URL'",
                 "text": ":farmer: *'$GITHUB_USER_NAME'* committed.\n\n```\n'${CI_COMMIT_MESSAGE}'\n```"
               }
@@ -43,4 +43,4 @@ runs:
         }
 
         COLOR='#439FE0' # info color
-        sendMessage "$COLOR" "Deploying to $ENVIRONMENT..."
+        sendMessage "$COLOR" "Deploying to $ENVIRONMENT :clock1: :clock3: :clock430:"

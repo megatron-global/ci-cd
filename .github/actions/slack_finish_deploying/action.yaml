@@ -47,8 +47,8 @@ runs:
 
         if [ "${{ inputs.update-deployment-result }}" == "success" ]; then
           COLOR='#36A64F' # success color
-          sendMessage "$COLOR" "Deployed to $ENVIRONMENT successfully :rocket: :rocket: :rocket:"
+          sendMessage "$COLOR" "[SUCCESS] Deployed to $ENVIRONMENT :rocket:"
         else
           COLOR='#FF0000' # danger color
-          sendMessage "$COLOR" "Deployed to $ENVIRONMENT failed :skull_and_crossbones: :exploding_head: :hear_no_evil:"
+          sendMessage "$COLOR" "[FAILED] Deploy to $ENVIRONMENT :hear_no_evil:"
         fi
