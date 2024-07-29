@@ -13,7 +13,6 @@ runs:
       run: |
         echo "CI_JOB_URL=${{ github.event.head_commit.url }}" >> $GITHUB_ENV
         echo "GITHUB_USER_NAME=${{ github.actor }}" >> $GITHUB_ENV
-        echo "CI_COMMIT_MESSAGE=${{ github.event.head_commit.message }}" >> $GITHUB_ENV
 
     - name: Start deploy
       shell: bash
@@ -34,7 +33,7 @@ runs:
                 "color": "'$COLOR'",
                 "title": "'$CONTENT'",
                 "title_link": "'$CI_JOB_URL'",
-                "text": ":farmer: *'$GITHUB_USER_NAME'* committed.\n\n```\n'${CI_COMMIT_MESSAGE}'\n```"
+                "text": ":farmer: *'$GITHUB_USER_NAME'* committed.\n\n```\n'"$(escape "${{ github.event.head_commit.message }}")"'\n```"
               }
             ],
             "username": "Deployment Bot"
