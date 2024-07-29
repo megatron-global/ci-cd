@@ -18,9 +18,8 @@ runs:
       shell: bash
       run: |
         escape() {
-          VALUE=${1//\//""}
-          VALUE=${VALUE//\"/""}
-          VALUE=${VALUE//\\/""}
+          VALUE=${1//\\/\\\\}
+          VALUE=${VALUE//\"/\\\"}
           echo $VALUE
         }
 
