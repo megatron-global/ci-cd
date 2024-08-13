@@ -32,7 +32,9 @@ runs:
         RUNNER_ID: ${{ github.run_number }}
       run: |
         IMAGE_TAG=build-$PROJECT-$RUNNER_ID
-        docker build --build-arg ENVIRONMENT=$ENVIRONMENT -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG . # TODO: build from cache
+        NEW_IMAGE_NAME=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+        docker build --build-arg ENVIRONMENT=$ENVIRONMENT -t $NEW_IMAGE_NAME . # TODO: build from cache
         echo "Pushing image to ECR..."
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        echo "New image name=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+        docker push $NEW_IMAGE_NAME
+        echo "New image name=$NEW_IMAGE_NAME"
