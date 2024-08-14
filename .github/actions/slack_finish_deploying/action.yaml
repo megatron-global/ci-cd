@@ -1,0 +1,52 @@
+name: Finish deploying
+description: Notify end deploying
+
+inputs:
+  slack-webhook-url:
+    required: true
+  update-deployment-result:
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Set up environment variables
+      shell: bash
+      run: |
+        echo "CI_JOB_URL=${{ github.event.head_commit.url }}" >> $GITHUB_ENV
+        echo "GITHUB_USER_NAME=${{ github.actor }}" >> $GITHUB_ENV
+
+    - name: Send slack notification
+      shell: bash
+      run: |
+        escape() {
+          VALUE=${1//\\/\\\\}
+          VALUE=${VALUE//\"/\\\"}
+          echo $VALUE
+        }
+
+        sendMessage() {
+          local COLOR=$1
+          local CONTENT=$(escape "${2}")
+          local MESSAGE='{
+            "attachments": [
+              {
+                "color": "'$COLOR'",
+                "title": "'$CONTENT'",
+                "title_link": "'$CI_JOB_URL'",
+                "text": ":farmer: *'$GITHUB_USER_NAME'* committed.\n\n```\n'"$(escape "${{ github.event.head_commit.message }}")"'\n```"
+
+              }
+            ],
+            "username": "Deployment Bot"
+          }'
+          curl -X POST -H 'Content-type: application/json' --data "$MESSAGE" ${{ inputs.slack-webhook-url }}
+        }
+
+        if [ "${{ inputs.update-deployment-result }}" == "success" ]; then
+          COLOR='#36A64F' # success color
+          sendMessage "$COLOR" "[SUCCESS] Deployed to $ENVIRONMENT :rocket:"
+        else
+          COLOR='#FF0000' # danger color
+          sendMessage "$COLOR" "[FAILED] Deploy to $ENVIRONMENT :hear_no_evil:"
+        fi

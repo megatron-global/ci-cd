@@ -1,0 +1,49 @@
+name: Publish SDK
+description: Publish microservice SDK
+
+inputs:
+  aws-secret-key:
+    required: true
+  aws-access-key-id:
+    required: true
+  gitlab_repository:
+    required: true
+  gitlab_username:
+    required: true
+  gitlab_password:
+    required: true
+
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11.6"
+
+    - name: Install Package
+      shell: bash
+      run: python -m pip install -r requirements.txt
+
+    - name: Setup credentials
+      shell: bash
+      run: |
+        cat <<EOF > ~/.pypirc
+        [distutils]
+        index-servers = gitlab
+
+        [gitlab]
+        repository = ${{ inputs.gitlab_repository }}
+        username = ${{ inputs.gitlab_username }}
+        password = ${{ inputs.gitlab_password }}
+        EOF
+
+    - name: Build and pubish package
+      shell: bash
+      env:
+        AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
+        AWS_SECRET_KEY: ${{ inputs.aws-secret-key }}
+      run: |
+        cp .env.unit-test .env
+        ./build_and_publish.sh
