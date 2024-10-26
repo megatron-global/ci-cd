@@ -4,6 +4,10 @@ description: Notify start deploying
 inputs:
   discord-webhook-url:
     required: true
+  project:
+    required: false
+    default: 'application'
+
 
 runs:
   using: composite
@@ -43,4 +47,4 @@ runs:
         }
 
         COLOR=4433150 # Discord color in decimal for '#439FE0'
-        sendMessage "$COLOR" "Deploying to $ENVIRONMENT :clock1: :clock3: :clock430:"
+        sendMessage "$COLOR" "Deploying [${{ inputs.project }}] to $ENVIRONMENT :clock1: :clock3: :clock430:"

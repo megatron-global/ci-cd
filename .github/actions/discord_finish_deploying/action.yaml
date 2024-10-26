@@ -6,6 +6,9 @@ inputs:
     required: true
   update-deployment-result:
     required: true
+  project:
+    required: false
+    default: 'application'
 
 runs:
   using: composite
@@ -46,8 +49,8 @@ runs:
 
         if [ "${{ inputs.update-deployment-result }}" == "success" ]; then
           COLOR=3610103 # Decimal color for '#36A64F' (success)
-          sendMessage "$COLOR" "[SUCCESS] Deployed to $ENVIRONMENT :rocket:"
+          sendMessage "$COLOR" "[SUCCESS] Deployed [${{ inputs.project }}] to $ENVIRONMENT :rocket:"
         else
           COLOR=16711680 # Decimal color for '#FF0000' (failure)
-          sendMessage "$COLOR" "[FAILED] Deploy to $ENVIRONMENT :hear_no_evil:"
+          sendMessage "$COLOR" "[FAILED] Deploy [${{ inputs.project }}] to $ENVIRONMENT :hear_no_evil:"
         fi
