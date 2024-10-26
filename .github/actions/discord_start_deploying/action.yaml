@@ -1,0 +1,46 @@
+name: Start deploying
+description: Notify start deploying
+
+inputs:
+  discord-webhook-url:
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Set up environment variables
+      shell: bash
+      run: |
+        echo "CI_JOB_URL=${{ github.event.head_commit.url }}" >> $GITHUB_ENV
+        echo "GITHUB_USER_NAME=${{ github.actor }}" >> $GITHUB_ENV
+
+    - name: Start deploy
+      shell: bash
+      run: |
+        escape() {
+          VALUE=${1//\\/\\\\}
+          VALUE=${VALUE//\"/\\\"}
+          echo $VALUE
+        }
+
+        sendMessage() {
+          local COLOR=$1
+          local CONTENT=$(escape "${2}")
+          local MESSAGE='{
+            "embeds": [
+              {
+                "color": '$COLOR',
+                "title": "'$CONTENT'",
+                "url": "'$CI_JOB_URL'",
+                "description": ":farmer: **'$GITHUB_USER_NAME'** committed.\n\n```\n'"$(escape "${{ github.event.head_commit.message }}")"'\n```\n",
+                "timestamp": "'"$(date --utc +%FT%TZ)"'"
+              }
+            ],
+            "username": "Deployment Bot",
+            "avatar_url": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+          }'
+          curl -X POST -H 'Content-Type: application/json' -d "$MESSAGE" ${{ inputs.discord-webhook-url }}
+        }
+
+        COLOR=4433150 # Discord color in decimal for '#439FE0'
+        sendMessage "$COLOR" "Deploying to $ENVIRONMENT :clock1: :clock3: :clock430:"
