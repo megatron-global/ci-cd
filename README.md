@@ -6,8 +6,13 @@ Composite actions are located in the .github/actions directory. The following ac
 
 - test
 - publish_sdk
-- build
+- build_image
+- build_frontend_image
 - update_deployment
+- slack_start_deploying
+- slack_finish_deploying
+- discord_start_deploying
+- discord_finish_deploying
 
 ### How to use
 
@@ -57,10 +62,21 @@ name: CI/CD
 on: push
 
 jobs:
+  start-deploying:
+    needs: set-env
+    runs-on: ubuntu-latest
+    env:
+      ENVIRONMENT: ${{ needs.set-env.outputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build docker image
+        uses: megatron-global/ci-cd/.github/actions/slack_start_deploying@main
+        with:
+          slack-webhook-url: ${{ env.SLACK_WEBHOOK_URL }}
+
   test:
     runs-on: self-hosted
     steps:
-
       - uses: actions/checkout@v4
       - name: Run e2e test
         uses: megatron-global/ci-cd/.github/actions/test@main
@@ -106,4 +122,22 @@ jobs:
       - uses: actions/checkout@v4 
       - name: Update deployment
         uses: megatron-global/ci-cd/.github/actions/update_deployment@main
+
+  finish-deploying:
+    if: |
+      github.event_name == 'push' ||
+      github.event_name == 'pull_request' && (
+        github.event.action == 'closed' &&
+        github.event.pull_request.merged == true
+      )
+    needs: [...]
+    env:
+      ENVIRONMENT: ${{ needs.set-env.outputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Notify deployment completion
+        uses: megatron-global/ci-cd/.github/actions/slack_finish_deploying@main
+        with:
+          slack-webhook-url: ${{ env.SLACK_WEBHOOK_URL }}
+          update-deployment-result: ${{ needs.update-deployment.result }}
 ```

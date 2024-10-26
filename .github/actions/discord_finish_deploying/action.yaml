@@ -1,0 +1,53 @@
+name: Finish deploying
+description: Notify end deploying
+
+inputs:
+  discord-webhook-url:
+    required: true
+  update-deployment-result:
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Set up environment variables
+      shell: bash
+      run: |
+        echo "CI_JOB_URL=${{ github.event.head_commit.url }}" >> $GITHUB_ENV
+        echo "GITHUB_USER_NAME=${{ github.actor }}" >> $GITHUB_ENV
+
+    - name: Send Discord notification
+      shell: bash
+      run: |
+        escape() {
+          VALUE=${1//\\/\\\\}
+          VALUE=${VALUE//\"/\\\"}
+          echo $VALUE
+        }
+
+        sendMessage() {
+          local COLOR=$1
+          local CONTENT=$(escape "${2}")
+          local MESSAGE='{
+            "embeds": [
+              {
+                "color": '$COLOR',
+                "title": "'$CONTENT'",
+                "url": "'$CI_JOB_URL'",
+                "description": ":farmer: **'$GITHUB_USER_NAME'** committed.\n\n```\n'"$(escape "${{ github.event.head_commit.message }}")"'\n```\n",
+                "timestamp": "'"$(date --utc +%FT%TZ)"'"
+              }
+            ],
+            "username": "Deployment Bot",
+            "avatar_url": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+          }'
+          curl -X POST -H 'Content-Type: application/json' -d "$MESSAGE" ${{ inputs.discord-webhook-url }}
+        }
+
+        if [ "${{ inputs.update-deployment-result }}" == "success" ]; then
+          COLOR=3610103 # Decimal color for '#36A64F' (success)
+          sendMessage "$COLOR" "[SUCCESS] Deployed to $ENVIRONMENT :rocket:"
+        else
+          COLOR=16711680 # Decimal color for '#FF0000' (failure)
+          sendMessage "$COLOR" "[FAILED] Deploy to $ENVIRONMENT :hear_no_evil:"
+        fi
