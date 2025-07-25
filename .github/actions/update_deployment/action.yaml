@@ -17,7 +17,7 @@ runs:
     - name: Update image in values.yaml
       shell: bash
       env:
-        RUNNER_ID: ${{ github.run_number }}
+        RUNNER_ID: ${{ github.run_id }}
       run: |
          IMAGE_TAG=build-$PROJECT-$RUNNER_ID
          cd $HELM_DEPLOYMENT_DIRECTORY
